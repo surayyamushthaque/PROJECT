@@ -1,0 +1,118 @@
+/* GENERAL */
+body {
+  font-family: Arial, sans-serif;
+  background: hsl(0, 48%, 75%);
+}
+
+/* CARD (SIGNUP BOX) */
+.card {
+  border: none;
+  border-radius: 15px;
+  background: #d5a9a9;
+}
+
+/* TITLE */
+.card h3 {
+  font-weight: 600;
+}
+
+/* INPUT FIELDS */
+.form-control {
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #f0a0a0;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #1e1616;
+  box-shadow: none;
+}
+
+/* BUTTON */
+.btn-dark {
+  background: #000;
+  border: none;
+  padding: 10px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.btn-dark:hover {
+  background: #333;
+}
+
+/* GOOGLE BUTTON */
+.btn-outline-dark {
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.btn-outline-dark:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* ERROR TEXT */
+.text-danger {
+  font-size: 12px;
+}
+
+/* NAVBAR */
+.navbar-brand {
+  font-weight: bold;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  color: #0a0707;
+}
+
+/* FOOTER */
+.footer {
+  background: #000;
+  color: #ba9292;
+  padding: 40px 0;
+  margin-top: 50px;
+}
+
+.footer a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: #fff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 500px) {
+  .card {
+    width: 90% !important;
+  }
+}
+/* PASSWORD EYE ICON */
+.toggle-password {
+  position: absolute;
+  top: 38px;
+  right: 12px;
+  cursor: pointer;
+  color: #211e1e;
+  font-size: 14px;
+}
+
+.toggle-password:hover {
+  color: hsl(0, 15%, 92%);
+}
+.invalid {
+  border: 1px solid red;
+}
+
+.valid {
+  border: 1px solid green;
+}

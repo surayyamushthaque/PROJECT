@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  
+</head>
+<body>
+  <style>
+
+  * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* HEADER */
+.top-header {
+  background: #e8e8e8;
+  padding: 12px 28px;
+  border-bottom: 2px solid #3a3aff;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.brand-dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid #1a1a1a;
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* PAGE BACKGROUND */
+.page-wrapper {
+  min-height: calc(100vh - 50px - 130px);
+  background-color: #d59a9a;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(210,130,130,0.5) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(160,80,80,0.35) 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* WELCOME TEXT */
+.welcome-text {
+  margin: 25px 0;
+  font-size: 26px;
+}
+
+/* LOGIN BOX */
+.login-box {
+  background: #e6e6e6;
+  width: 360px;
+  padding: 30px;
+  text-align: center;
+}
+
+/* TITLE */
+.login-box h2 {
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+.login-box input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #999;
+  outline: none;
+}
+
+/* LOGIN BUTTON */
+.login-btn {
+  width: 100%;
+  padding: 10px;
+  background: #111;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background: #333;
+}
+
+/* SIGNUP TEXT */
+.signup-text {
+  margin-top: 15px;
+  font-size: 12px;
+}
+
+.signup-text a {
+  color: #000;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* FORGOT PASSWORD */
+.login-box > a {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #000;
+  text-decoration: none;
+}
+
+/* FOOTER */
+.footer {
+  background: #1a1a1a;
+  padding: 36px 48px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+.footer-brand {
+  color: #ffffff;
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.footer-brand .brand-dot {
+  border-color: #ffffff;
+}
+
+.footer-copy {
+  color: #555555;
+  font-size: 10px;
+  margin-top: 6px;
+}
+
+.footer-col h4 {
+  color: #888888;
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 12px;
+  font-weight: 900;
+}
+
+.footer-col a {
+  display: block;
+  color: #cccccc;
+  font-size: 12px;
+  margin-bottom: 7px;
+  text-decoration: none;
+  transition: color 0.18s;
+}
+
+.footer-col a:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .footer {
+    padding: 28px 20px;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .login-box {
+    width: 92vw;
+  }
+}
+</style>
+ 
+  
+  <%- include("../partials/headers", { title: "Signup", user: user }) %>
+  <div class="page-wrapper">
+    <h1 class="welcome-text">Welcome !</h1>
+
+    <div class="login-box">
+      <h2>LOGIN</h2>
+      <p class="subtitle">Enter your email and password to login</p>
+
+      <form onsubmit="handleLogin(event)">
+        <p id ="message"></p>
+        <input
+          type="email"
+          id="email"
+          placeholder="Email"
+          required
+        >
+
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          required
+        >
+
+        <button type="submit" class="login-btn">LOGIN</button>
+      </form>
+
+      <p class="signup-text">
+        Don't have an account?
+        <a href="/user/signup">Sign up</a>
+      </p>
+      <a href="/user/forgot-password">Forgot Password?</a>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>
+      <div class="footer-brand">CHR<span class="brand-dot"></span>NIC</div>
+      <div class="footer-copy">© 2024 CHRONIC. All rights reserved.</div>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <a href="#">Shipping</a>
+      <a href="#">Contact Us</a>
+      <a href="#">Return &amp; Exchange Policy</a>
+      <a href="#">Exchange Request</a>
+      <a href="#">Warranty</a>
+    </div>
+    <div class="footer-col">
+      <h4>Menu</h4>
+      <a href="#">About Me</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+async function handleLogin(event) {
+  event.preventDefault(); // 🚀 stop form reload
+console.log("Login clicked");
+  const messageEl = document.getElementById("message");
+
+  try {
+    const res = await axios.post("/user/login", {
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value
+    });
+
+    messageEl.innerText = res.data.message;
+if (res.data.success) {
+  messageEl.style.color = "green";
+  messageEl.innerText = res.data.message;
+
+  setTimeout(() => {
+    window.location.href = "/user/home";
+  }, 1000);
+}
+
+ else {
+      messageEl.style.color = "red";
+
+      // ✅ REDIRECT TO SIGNUP (OPTIONAL)
+      setTimeout(() => {
+        window.location.href = res.data.redirect;
+      }, 1000);
+    }
+
+  } catch (err) {
+    console.error(err);
+    messageEl.innerText = err.response?.data?.error || "Something went wrong";
+    messageEl.style.color = "red";
+  }
+}
+</script>
+
+</body>
+</html>

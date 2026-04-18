@@ -1,0 +1,222 @@
+<%- include("../partials/headers", { title: "Signup", user: user }) %>
+<link rel="stylesheet" href="/css/style.css">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+  <div class="card shadow-lg p-4" style="width: 400px; border-radius: 15px;">
+
+    <h3 class="text-center mb-3">Create Account</h3>
+    <p class="text-center text-muted mb-4">Join CHRONIC today</p>
+
+   <form id="signform">
+
+  <div class="mb-3">
+    <label>Full Name</label>
+    <input type="text" id="name" name="name" class="form-control">
+    <small id="error-name" class="text-danger"></small>
+  </div>
+
+  <div class="mb-3">
+    <label>Email</label>
+    <input type="email" id="email" name="email" class="form-control">
+    <small id="error-email" class="text-danger"></small>
+  </div>
+
+  <div class="mb-3">
+    <label>Phone</label>
+    <input type="tel" id="phone" name="phone" class="form-control">
+    <small id="error-phone" class="text-danger"></small>
+  </div>
+
+  <div class="mb-3 position-relative">
+    <label>Password</label>
+    <input type="password" id="password" name="password" class="form-control pe-5">
+    <i class="fa-solid fa-eye-slash toggle-password"
+       onclick="togglePassword('password', this)"></i>
+    <small id="error-password" class="text-danger"></small>
+  </div>
+
+  <div class="mb-3 position-relative">
+    <label>Confirm Password</label>
+    <input type="password" id="confirmPassword" class="form-control pe-5">
+    <i class="fa-solid fa-eye-slash toggle-password"
+       onclick="togglePassword('confirmPassword', this)"></i>
+    <small id="error-confirmPassword" class="text-danger"></small>
+  </div>
+
+  <button type="submit" class="btn btn-dark w-100">Sign Up</button>
+
+</form>
+    <div class="text-center my-3">OR</div>
+
+    <a href="/auth/google" class="btn btn-outline-dark w-100 mb-2">
+      <i class="fab fa-google"></i> Continue with Google
+    </a>
+
+    <p class="text-center mt-3">
+      Already have an account?
+      <a href="/user/login">Login</a>
+    </p>
+
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+
+function togglePassword(id, icon) {
+  const input = document.getElementById(id);
+
+  if (input.type === "password") {
+    input.type = "text";
+    icon.classList.remove("fa-eye-slash");
+    icon.classList.add("fa-eye");
+  } else {
+    input.type = "password";
+    icon.classList.remove("fa-eye");
+    icon.classList.add("fa-eye-slash");
+  }
+}
+
+ document.addEventListener("DOMContentLoaded", () => {
+
+  const form = document.getElementById("signform");
+
+  const name = document.getElementById("name");
+  const email = document.getElementById("email");
+  const phone = document.getElementById("phone");
+  const password = document.getElementById("password");
+  const confirmPassword = document.getElementById("confirmPassword");
+
+  const errors = {
+    name: document.getElementById("error-name"),
+    email: document.getElementById("error-email"),
+    phone: document.getElementById("error-phone"),
+    password: document.getElementById("error-password"),
+    confirmPassword: document.getElementById("error-confirmPassword")
+  };
+
+
+  const nameRegex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^[6-9]\d{9}$/; // Indian format
+ const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
+  // 🔹 Utility
+  function setError(input, message, field) {
+    errors[field].textContent = message;
+    input.classList.add("invalid");
+    input.classList.remove("valid");
+  }
+
+  function clearError(input, field) {
+    errors[field].textContent = "";
+    input.classList.remove("invalid");
+    input.classList.add("valid");
+  }
+
+  
+  function validateName() {
+    const value = name.value.trim();
+    if (!nameRegex.test(value)) {
+      setError(name, "Enter valid name", "name");
+      return false;
+    }
+    clearError(name, "name");
+    return true;
+  }
+
+  function validateEmail() {
+    const value = email.value.trim();
+    if (!emailRegex.test(value)) {
+      setError(email, "Enter valid email", "email");
+      return false;
+    }
+    clearError(email, "email");
+    return true;
+  }
+
+  function validatePhone() {
+    const value = phone.value.trim();
+    if (!phoneRegex.test(value)) {
+      setError(phone, "Enter valid phone number", "phone");
+      return false;
+    }
+    clearError(phone, "phone");
+    return true;
+  }
+
+  function validatePassword() {
+    const value = password.value.trim();
+    if (!passwordRegex.test(value)) {
+      setError(password, "Min 6 chars, 1 uppercase & 1 special character required", "password");
+      return false;
+    }
+    clearError(password, "password");
+    return true;
+  }
+
+  function validateConfirmPassword() {
+    if (confirmPassword.value !== password.value) {
+      setError(confirmPassword, "Passwords do not match", "confirmPassword");
+      return false;
+    }
+    clearError(confirmPassword, "confirmPassword");
+    return true;
+  }
+
+  // 🔹 Live validation
+  name.addEventListener("input", validateName);
+  email.addEventListener("input", validateEmail);
+  phone.addEventListener("input", validatePhone);
+  password.addEventListener("input", validatePassword);
+  confirmPassword.addEventListener("input", validateConfirmPassword);
+
+  // 🔹 Submit with Axios
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const isValidName = validateName();
+    const isValidEmail = validateEmail();
+    const isValidPhone = validatePhone();
+    const isValidPassword = validatePassword();
+    const isValidConfirm = validateConfirmPassword();
+
+    const isValid =
+    isValidName &&
+    isValidEmail &&
+    isValidPhone &&
+    isValidPassword &&
+     isValidConfirm;
+     if (!isValid) return;
+
+     const data = {
+      name: name.value.trim(),
+      email: email.value.trim(),
+      phone: phone.value.trim(),
+      password: password.value.trim()
+     };
+
+     try {
+      const res = await axios.post("/user/signup", data);
+      if (res.data.message) {
+         window.location.href = "/user/verify-otp";
+          }
+     } catch (err) {
+  const backendErrors = err.response?.data?.errors;
+
+  if (backendErrors) {
+    backendErrors.forEach(e => {
+      if (errors[e.path]) {
+        errors[e.path].textContent = e.msg;
+      }
+    });
+  } else {
+   console.log(err.response?.data);
+alert(err.response?.data?.error || "Signup failed");
+  }
+ 
+ }
+   
+
+ });
+ }) 
+</script>
+
+<%- include("../partials/footer") %>

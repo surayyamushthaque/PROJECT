@@ -1,0 +1,59 @@
+<%- include("../partials/header", { title: "Home", user: user||null }) %>
+
+<link rel="stylesheet" href="\css\landingPage.css">
+
+<section class="hero-section">
+  <img src="/images/c2443b7d418b1fca1c0c6073092773831.png" alt="Hero Watch">
+</section>
+
+<!-- BEST SELLER -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="section-title">BEST SELLER</h2>
+    <div class="row g-4">
+
+      <div class="col-md-3">
+        <div class="product-card text-center">
+          <img src="/images/Rectangle270.png" class="product-img">
+          <div class="card-body">
+            <h6>Luxury Watch</h6>
+            <p class="price">$299.99</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="product-card text-center">
+          <img src="/images/Rectangle275.png" class="product-img">
+          <div class="card-body">
+            <h6>Sport Watch</h6>
+            <p class="price">$199.99</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="product-card text-center">
+          <img src="/images/product-card.png" class="product-img">
+          <div class="card-body">
+            <h6>Deep Ocean Blue</h6>
+            <p class="price">$199.99</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="product-card text-center">
+          <img src="/images/Rectangle274.png" class="product-img">
+          <div class="card-body">
+            <h6>Smart Watch</h6>
+            <p class="price">$399.99</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<%- include("../partials/footer") %>
