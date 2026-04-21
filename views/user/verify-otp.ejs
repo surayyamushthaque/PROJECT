@@ -133,7 +133,7 @@
    <input id="otp" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6">
     <div class="resend">
   <span id="timer">00:60</span>
-  <button id="resendBtn">Resend OTP</button>
+  <button id="resendOTP">Resend OTP</button>
 </div>
     <button id="confirmBtn">CONFIRM</button>
   </div>
@@ -154,33 +154,69 @@ function showToast(msg, type="error") {
 }
 
 const confirmBtn = document.getElementById("confirmBtn");
-const resendBtn = document.getElementById("resendBtn");
+const resendBtn = document.getElementById("resendOTP");
 const timerDisplay = document.getElementById("timer");
 
 let countdown;
-let timeLeft = 60; // ✅ FIXED
+let timeLeft = 120;
 
-// ✅ VERIFY OTP
-confirmBtn.addEventListener("click", async () => {
-  const otp = document.getElementById("otp").value.trim();
-  const email = localStorage.getItem("email"); // ✅ USE EMAIL
+// TIMER
+function startTimer() {
+  clearInterval(countdown);
+
+  timeLeft = 120;
+  resendBtn.disabled = true;
+
+  countdown = setInterval(() => {
+    timeLeft--;
+
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+
+    timerDisplay.textContent =
+      `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+
+    if (timeLeft <= 0) {
+      clearInterval(countdown);
+      resendBtn.disabled = false;
+      timerDisplay.textContent = "Resend available";
+    }
+  }, 1000);
+}
+
+// START TIMER
+document.addEventListener("DOMContentLoaded", () => {
+  startTimer();
+});
+
+// RESEND
+resendBtn.addEventListener("click", async () => {
+ 
 
   if (!email) {
-    showToast("Session expired. Please signup again.", "error");
-    return;
-  }
-
-  if (!/^\d{6}$/.test(otp)) {
-    showToast("Enter a valid 6-digit OTP", "error");
+    showToast("Session expired.", "error");
     return;
   }
 
   try {
-    const res = await axios.post("/user/verify-otp", { email, otp });
+    await axios.post("/user/resend-otp");
 
-    showToast(res.data.message || "OTP Verified!", "success");
+    showToast("OTP resent successfully", "success");
 
-    localStorage.removeItem("email");
+    startTimer();
+
+  } catch (err) {
+    showToast(err.response?.data?.error || "Could not resend OTP", "error");
+  }
+});
+
+confirmBtn.addEventListener("click", async () => {
+  const otp = document.getElementById("otp").value.trim();
+
+  try {
+    await axios.post("/user/verify-otp", { otp });
+
+    showToast("Account created!", "success");
 
     setTimeout(() => {
       window.location.href = "/user/login";
@@ -191,54 +227,6 @@ confirmBtn.addEventListener("click", async () => {
   }
 });
 
-
-// ⏳ TIMER FUNCTION
-function startTimer() {
-  timeLeft = 60;
-  resendBtn.disabled = true;
-
-  timerDisplay.textContent = `00:${timeLeft}`;
-
-  countdown = setInterval(() => {
-    timeLeft--;
-
-    timerDisplay.textContent =
-      `00:${timeLeft < 10 ? '0' + timeLeft : timeLeft}`;
-
-    if (timeLeft <= 0) {
-      clearInterval(countdown);
-      resendBtn.disabled = false;
-      timerDisplay.textContent = "Resend available";
-    }
-  }, 1000);
-}
-
-// 🚀 START TIMER ON LOAD
-window.onload = () => {
-  startTimer();
-};
-
-
-// 🔁 RESEND OTP
-resendBtn.addEventListener("click", async () => {
-  const email = localStorage.getItem("email");
-
-  if (!email) {
-    showToast("Session expired.", "error");
-    return;
-  }
-
-  try {
-    await axios.post("/user/resend-otp", { email });
-
-    showToast("OTP resent successfully", "success");
-
-    startTimer(); // restart timer
-
-  } catch (err) {
-    showToast(err.response?.data?.error || "Could not resend OTP", "error");
-  }
-});
 </script>
 
 </body>
