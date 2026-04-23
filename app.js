@@ -23,9 +23,11 @@ app.use(session({
     secret:"mySecretKey123",
     resave:false,
     saveUninitialized:false,
+
     cookie:{
         secure:false,
-        maxAge:10*60*1000
+        maxAge:10*60*1000,
+        httpOnly:true,
     }
 }))
 
@@ -43,6 +45,7 @@ app.use((req,res,next)=>{
     res.locals.user=req.user||req.session.user
     next()
 })
+
 
 
 export default app 

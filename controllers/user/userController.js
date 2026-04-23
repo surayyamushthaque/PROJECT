@@ -1,12 +1,12 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 import passport from "passport";
-import User from "../models/user.js";
+import User from "../../models/user.js";
 import bcrypt from "bcryptjs";
-import otpStore from "../config/otpStore.js"
-import {generateOTP} from "../utils/otp.js"
+import otpStore from "../../config/otpStore.js"
+import { generateOTP } from "../../utils/otp.js"
 import nodemailer from "nodemailer"
-import transporter from "../config/mailer.js"
+import transporter from "../../config/mailer.js"
 import axios from "axios";
 import crypto from "crypto";
 
@@ -14,20 +14,20 @@ import crypto from "crypto";
 
 
 
-export const landingPage =  (req,res)=>{
-    res.render("user/landing",{user:null})
+export const landingPage = (req, res) => {
+  res.render("user/landing", { user: null })
 }
 
 
-export const loadSignup = (req,res)=>{
-    res.render("user/signup",{user:null})
+export const loadSignup = (req, res) => {
+  res.render("user/signup", { user: null })
 }
 
 export const sendSignupOTP = async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
 
-    
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -37,15 +37,15 @@ export const sendSignupOTP = async (req, res) => {
 
     // ✅ generate OTP
     const otp = generateOTP();
-       
+
     req.session.otpData = {
       otp,
-      userData:{ name,email,phone,password},
-      expires: Date.now()+2*60*1000,
+      userData: { name, email, phone, password },
+      expires: Date.now() + 2 * 60 * 1000,
       createdAt: Date.now()
     }
 
-      
+    console.log("Sign up otp ->" + otp)
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -53,7 +53,7 @@ export const sendSignupOTP = async (req, res) => {
       subject: "Your OTP Code",
       text: `Your OTP is ${otp}. It expires in 2 minutes.`
     });
-    
+
 
     return res.json({
       success: true,
@@ -61,14 +61,14 @@ export const sendSignupOTP = async (req, res) => {
     });
 
   } catch (err) {
-  console.log("FULL ERROR 👉", err);
-  console.log("MESSAGE 👉", err.message);
-  return res.status(500).json({ error: err.message });
-}
+    console.log("FULL ERROR 👉", err);
+    console.log("MESSAGE 👉", err.message);
+    return res.status(500).json({ error: err.message });
+  }
 };
 
 export const loadVerifyOtp = (req, res) => {
-  res.render("user/verify-Otp",{user:null});
+  res.render("user/verify-Otp", { user: null });
 };
 
 export const verifySignupOTP = async (req, res) => {
@@ -115,18 +115,18 @@ export const verifySignupOTP = async (req, res) => {
   }
 };
 
-  export const resendOTP = async (req, res) => {
+export const resendOTP = async (req, res) => {
   try {
-   
+
 
     const record = req.session.otpData
-     if(!record){
-      return res.status(400).json({error:"Session expired. please signup again"})
+    if (!record) {
+      return res.status(400).json({ error: "Session expired. please signup again" })
 
-     }
+    }
 
-     
-    if ( Date.now() - record.createdAt < 30 * 1000) {
+
+    if (Date.now() - record.createdAt < 30 * 1000) {
       return res.status(400).json({
         error: "Please wait before requesting another OTP"
       });
@@ -137,8 +137,8 @@ export const verifySignupOTP = async (req, res) => {
     req.session.otpData = {
       ...record,
       otp,
-      expires :Date.now()+2*60*1000,
-      createdAt:Date.now()
+      expires: Date.now() + 2 * 60 * 1000,
+      createdAt: Date.now()
     }
 
     await transporter.sendMail({
@@ -162,72 +162,75 @@ export const verifySignupOTP = async (req, res) => {
 
 
 
-  export const loadLanding=(req,res)=>{
-    res.render("user/login",{user:null})
-  }
+export const loadLanding = (req, res) => {
+  res.render("user/login", { user: null })
+}
 
-   export const postLogin=async (req,res)=>{
+export const postLogin = async (req, res) => {
 
-    try{
-      
-      const{email,password}=req.body
-      const user=await User.findOne({email})
-      if(!user){
-        return res.status(400).json({
-          success:false,
-          error:"user not found"
-        })
-      }
-      const isMatch= await bcrypt.compare(password,user.password)
-        if(!isMatch){
-          return res.status(400).json({succes:false,
-            error:"Invalid Password"
-          })
-        }
+  try {
 
-         req.session.user = {
-         id: user._id,
-         username: user.name
-         };
-
-        res.json({success:true,
-          message:"Login Successful",
-          userId:user._id
-        })
-
-
-        
-       }catch(err){
-        res.status(500).json({success:false,
-          error:err.message
-        })
-
-       }
-
-       
-   }
-
-
-  export const loadHome=(req,res)=>{
-    res.render("user/home",{user:req.session.user})
-  }
-   
- 
- 
-  export const logout = (req, res) => {
-    try{
-  req.session.destroy((err) => {
-    if(err){
-      console.log(err)
-      return res.status(500).send("Logout failed")
+    const { email, password } = req.body
+    const user = await User.findOne({ email })
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        error: "user not found"
+      })
     }
-    res.json({success:true})
-   
-  });
-}catch(err){
-  res.status(500).send(err.message)
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+      return res.status(400).json({
+        succes: false,
+        error: "Invalid Password"
+      })
+    }
+
+    req.session.user = {
+      id: user._id,
+      username: user.name
+    };
+
+    res.json({
+      success: true,
+      message: "Login Successful",
+      userId: user._id
+    })
+
+
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    })
+
+  }
+
 
 }
+
+
+export const loadHome = (req, res) => {
+  res.render("user/home", { user: req.session.user })
+}
+
+
+
+export const logout = (req, res) => {
+  try {
+    req.session.destroy((err) => {
+      if (err) {
+        console.log(err)
+        return res.status(500).send("Logout failed")
+      }
+      res.json({ success: true })
+
+    });
+  } catch (err) {
+    res.status(500).send(err.message)
+
+  }
 };
 
 
@@ -239,16 +242,16 @@ export const googleCallback = [
     failureRedirect: "/user/login"
   }),
   (req, res) => {
-    req.session.user={
-      id:req.user._id,
-      username:req.user.displayName||req.user.name
+    req.session.user = {
+      id: req.user._id,
+      username: req.user.displayName || req.user.name
     }
     res.redirect("/user/home");
   }
 ];
 
 
-export const loadForgotPassword =((req,res)=>{
+export const loadForgotPassword = ((req, res) => {
   res.render("user/forgot-password")
 })
 
@@ -291,7 +294,7 @@ export const sendForgotPasswordOTP = async (req, res) => {
 };
 
 
-export const loadresetPassword=((req,res)=>{
+export const loadresetPassword = ((req, res) => {
   res.render("user/reset-password", { token: req.params.token });
 })
 
@@ -326,7 +329,7 @@ export const resetPassword = async (req, res) => {
     await user.save();
 
     // optional: destroy session
-    req.session.destroy(() => {});
+    req.session.destroy(() => { });
 
     res.json({
       success: true,
@@ -411,25 +414,25 @@ export const verifyForgotOTP = (req, res) => {
 
 
 export default {
-    landingPage,
-    loadSignup,
-    sendSignupOTP,
-    loadLanding,
-    postLogin,
-    loadHome,
-    logout,
-    loadVerifyOtp,
-    verifySignupOTP,
-    resendOTP,
-    googleAuth,
-    googleCallback,
-    loadForgotPassword,
-    loadresetPassword,
-    resetPassword,
-    verifyForgotOTP,
-    sendForgotPasswordOTP
-    
+  landingPage,
+  loadSignup,
+  sendSignupOTP,
+  loadLanding,
+  postLogin,
+  loadHome,
+  logout,
+  loadVerifyOtp,
+  verifySignupOTP,
+  resendOTP,
+  googleAuth,
+  googleCallback,
+  loadForgotPassword,
+  loadresetPassword,
+  resetPassword,
+  verifyForgotOTP,
+  sendForgotPasswordOTP
 
-    
-    
+
+
+
 }

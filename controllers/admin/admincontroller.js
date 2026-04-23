@@ -1,11 +1,11 @@
 
-import User from "../models/admin.js";
+import User from "../../models/user.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import passport from "passport";
 import dotenv from "dotenv"; 
-
+import {getUsersService,toggleBlockUserService,} from "../services/admin/user-service.js";
 dotenv.config();
 
 export const loadLogin = (req,res)=>{
@@ -104,16 +104,64 @@ export const toggleBlockUser = async(req,res)=>{
 // controller/adminController.js
 export const getUsers = async (req, res) => {
   try {
-    let sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
+    const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
 
-    const users = await User.find()
-      .sort({ name: sortOrder })
-      .lean(); // lean() returns plain JS objects
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    res.render("admin/users", {search: "", users, totalPages : 0})
+    const search = req.query.search || "";
+
+    let filter = {};
+
+    if (search.trim() !== "") {
+      filter = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } }
+        ]
+      };
+    }
+
+    const users = await User.find(filter)
+      .sort({ createdAt: sortOrder })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await User.countDocuments(filter);
+
+    console.log(users);
+
+    res.render("admin/users", {
+      search,
+      users,
+      total,
+      page
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const blockUser = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.params.id, { isBlocked: true });
+    res.redirect("/admin/users");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error blocking user");
+  }
+};
+// UNBLOCK USER
+export const unblockUser = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.params.id, { isBlocked: false });
+    res.redirect("/admin/users");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error unblocking user");
   }
 };
 
@@ -125,7 +173,10 @@ export default{
     isAdmin,
     dashboardData,
     getUsers,
-    toggleBlockUser
+    toggleBlockUser,
+    unblockUser,
+    blockUser 
+    
 }
 
 

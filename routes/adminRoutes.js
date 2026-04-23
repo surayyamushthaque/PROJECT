@@ -1,8 +1,8 @@
 
 import express from "express";
-import adminroute from "../controllers/admincontroller.js";
+import adminroute from "../controllers/admin/admincontroller.js";
 import admin from "../models/admin.js";
-
+import {authMiddleware} from "../middlewares/Auth.js"
 const router = express.Router();
 
 
@@ -18,4 +18,9 @@ router.get("/dashboard",adminroute.isAdmin,adminroute.loadDashboard)
 router.get("/dashboard",adminroute.dashboardData)
 router.get("/users", adminroute.isAdmin, adminroute.getUsers);
 router.patch("/user/block/:id",adminroute.toggleBlockUser)
+router.post("/block-user/:id",authMiddleware,adminroute.blockUser);
+router.post("/unblock-user/:id", authMiddleware,adminroute.unblockUser);
+
+
+
 export default router;
