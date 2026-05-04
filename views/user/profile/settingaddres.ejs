@@ -1,253 +1,166 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>My Addresses</title>
+<%- include("../../partials/header", { title: "My Addresses", user: user }) %>
 
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+  <div class="card shadow-lg p-4" style="width: 900px; max-width: 95vw; border-radius: 15px;">
 
-<style>
-body {
-  font-family: 'Barlow', sans-serif;
-  background: #f5f3ee;
-  margin: 0;
-}
-
-/* NAV */
-nav {
-  background: #111;
-  color: #fff;
-  padding: 15px 40px;
-  display: flex;
-  justify-content: space-between;
-}
-
-nav a {
-  color: #ccc;
-  text-decoration: none;
-  margin-left: 20px;
-  font-size: 13px;
-}
-
-/* CONTAINER */
-.container {
-  max-width: 1000px;
-  margin: 40px auto;
-}
-
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
-  gap: 20px;
-}
-
-/* CARD */
-.card {
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 15px;
-  position: relative;
-}
-
-.card.default {
-  border: 2px solid #b08d57;
-}
-
-.tag {
-  font-size: 11px;
-  color: #b08d57;
-  margin-bottom: 5px;
-}
-
-.name {
-  font-weight: 600;
-}
-
-.text {
-  font-size: 13px;
-  color: gray;
-}
-
-/* BUTTONS */
-.btn {
-  padding: 6px 12px;
-  font-size: 12px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-dark { background: #111; color: #fff; }
-.btn-outline { border: 1px solid #ccc; background: transparent; }
-.btn-danger { border: 1px solid red; color: red; background: transparent; }
-
-.actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-
-/* ADD CARD */
-.add-card {
-  border: 2px dashed #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 20px;
-  width: 400px;
-}
-
-/* FORM */
-input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<nav>
-  <div>CHRONIC</div>
-  <div>
-    <a href="/profile">Profile</a>
-    <a href="/user/profile/change-password">Password</a>
-  </div>
-</nav>
-
-<div class="container">
-
-  <div class="header">
-    <h2>My Addresses</h2>
-    <button class="btn btn-dark" onclick="openModal()">+ Add Address</button>
-  </div>
-
-  <% if (message) { %>
-    <div style="margin:10px 0;font-size:13px;color:<%= message.type === 'success' ? 'green' : 'red' %>">
-      <%= message.text %>
-    </div>
-  <% } %>
-
-  <div class="grid">
-
-    <% addresses.forEach(addr => { %>
-      <div class="card">
-
-        <div class="name"><%= addr.name %></div>
-
-        <div class="text">
-          <%= addr.street %><br>
-          <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %><br>
-          <%= addr.country %><br>
-          <% if (addr.landmark) { %>Landmark: <%= addr.landmark %><br><% } %>
-          <%= addr.phone %>
-        </div>
-
-        <div class="actions">
-          <a href="/user/addresses/edit/<%= addr._id %>">
-            <button type="button" class="btn btn-outline">Edit</button>
-          </a>
-
-          <form action="/user/addresses/delete/<%= addr._id %>" method="POST" onsubmit="return confirm('Delete this address?')">
-            <button class="btn btn-danger" type="submit">Delete</button>
-          </form>
-        </div>
-
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="mb-1">My Addresses</h3>
+        <p class="text-muted mb-0">Manage your saved addresses</p>
       </div>
-    <% }) %>
-
-    <!-- ADD CARD -->
-    <div class="card add-card" onclick="openModal()">
-      + Add Address
+      <button class="btn btn-dark" onclick="openModal()">+ Add Address</button>
     </div>
 
+    <% if (message) { %>
+      <div class="text-center mb-3 <%= message.type === 'success' ? 'text-success' : 'text-danger' %>">
+        <%= message.text %>
+      </div>
+    <% } %>
+
+    <div class="row g-3">
+      <% if (!addresses || addresses.length === 0) { %>
+        <div class="col-12 text-center text-muted">No addresses yet. Add one to get started.</div>
+      <% } %>
+
+      <% (addresses || []).forEach(addr => { %>
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="border rounded p-3 bg-white" style="border-color:#f0a0a0 !important;">
+            <div class="fw-semibold mb-1"><%= addr.name %></div>
+            <div class="text-muted" style="font-size:13px;">
+              <%= addr.street %><br>
+              <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %><br>
+              <%= addr.country %><br>
+              <% if (addr.landmark) { %>Landmark: <%= addr.landmark %><br><% } %>
+              Phone: <%= addr.phone %>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+              <a href="/user/addresses/edit/<%= addr._id %>" class="btn btn-outline-dark btn-sm flex-grow-1">Edit</a>
+              <form action="/user/addresses/delete/<%= addr._id %>" method="POST" class="flex-grow-1 js-delete-address">
+                <button type="submit" class="btn btn-dark btn-sm w-100">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/user/profile" class="btn btn-outline-dark">Back to Profile</a>
+    </div>
   </div>
 </div>
 
 <!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-content">
+<div class="modal fade" id="addressModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Address</h5>
+        <button type="button" class="btn-close" onclick="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addressForm" method="POST" action="/user/addresses/add" onsubmit="return validateAddressForm()">
+          <div class="mb-2">
+            <label>Full Name</label>
+            <input type="text" name="name" class="form-control" placeholder="Full Name" required>
+            <small class="text-danger" id="err-name"></small>
+          </div>
+          <div class="mb-2">
+            <label>Phone</label>
+            <input type="text" name="phone" class="form-control" placeholder="Phone" required>
+            <small class="text-danger" id="err-phone"></small>
+          </div>
+          <div class="mb-2">
+            <label>Address Line (Street)</label>
+            <input type="text" name="street" class="form-control" placeholder="Street" required>
+            <small class="text-danger" id="err-street"></small>
+          </div>
+          <div class="mb-2">
+            <label>City</label>
+            <input type="text" name="city" class="form-control" placeholder="City" required>
+            <small class="text-danger" id="err-city"></small>
+          </div>
+          <div class="mb-2">
+            <label>State</label>
+            <input type="text" name="state" class="form-control" placeholder="State" required>
+            <small class="text-danger" id="err-state"></small>
+          </div>
+          <div class="mb-2">
+            <label>Pincode / ZIP</label>
+            <input type="text" name="pincode" class="form-control" placeholder="Pincode / ZIP" required>
+            <small class="text-danger" id="err-pincode"></small>
+          </div>
+          <div class="mb-2">
+            <label>Country</label>
+            <input type="text" name="country" class="form-control" placeholder="Country" required>
+            <small class="text-danger" id="err-country"></small>
+          </div>
+          <div class="mb-2">
+            <label>Landmark (optional)</label>
+            <input type="text" name="landmark" class="form-control" placeholder="Landmark">
+          </div>
 
-    <h3 id="modalTitle">Add Address</h3>
-
-    <form id="addressForm" method="POST" action="/user/addresses/add" onsubmit="return validateAddressForm()">
-
-      <input type="text" name="name" placeholder="Full Name" required>
-      <input type="text" name="phone" placeholder="Phone" required>
-      <input type="text" name="street" placeholder="Address Line (Street)" required>
-      <input type="text" name="city" placeholder="City" required>
-      <input type="text" name="state" placeholder="State" required>
-      <input type="text" name="pincode" placeholder="Pincode" required>
-      <input type="text" name="country" placeholder="Country" required>
-      <input type="text" name="landmark" placeholder="Landmark (optional)">
-
-      <div id="addrError" style="display:none;margin-top:8px;font-size:13px;color:red;"></div>
-
-      <button class="btn btn-dark">Save</button>
-      <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-
-    </form>
-
+          <button type="submit" class="btn btn-dark w-100 mt-2">Save</button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+let modal;
 function openModal() {
-  document.getElementById("modal").style.display = "flex";
+  const el = document.getElementById("addressModal");
+  modal = bootstrap.Modal.getOrCreateInstance(el);
   document.getElementById("addressForm").reset();
-  document.getElementById("addrError").style.display = "none";
-  document.getElementById("addrError").textContent = "";
+  ["name","phone","street","city","state","pincode","country"].forEach(k => {
+    const e = document.getElementById("err-" + k);
+    if (e) e.textContent = "";
+  });
+  modal.show();
 }
-
 function closeModal() {
-  document.getElementById("modal").style.display = "none";
+  if (modal) modal.hide();
 }
 
 function validateAddressForm() {
   const form = document.getElementById("addressForm");
   const phone = (form.phone.value || "").trim();
   const pin = (form.pincode.value || "").trim();
-  const err = document.getElementById("addrError");
 
+  document.getElementById("err-phone").textContent = "";
+  document.getElementById("err-pincode").textContent = "";
+
+  let ok = true;
   if (!/^\+?[0-9]{10,15}$/.test(phone)) {
-    err.style.display = "block";
-    err.textContent = "Phone number is invalid.";
-    return false;
+    document.getElementById("err-phone").textContent = "Enter a valid phone number";
+    ok = false;
   }
   if (!/^[0-9]{4,10}$/.test(pin)) {
-    err.style.display = "block";
-    err.textContent = "Pincode must be numeric.";
-    return false;
+    document.getElementById("err-pincode").textContent = "Pincode / ZIP must be numeric";
+    ok = false;
   }
-  err.style.display = "none";
-  err.textContent = "";
-  return true;
+  return ok;
 }
+
+document.querySelectorAll(".js-delete-address").forEach((form) => {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!window.Swal) return form.submit();
+    const result = await Swal.fire({
+      icon: "warning",
+      title: "Delete address?",
+      text: "This action cannot be undone.",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#000",
+    });
+    if (result.isConfirmed) form.submit();
+  });
+});
 </script>
 
-</body>
-</html>
+<%- include("../../partials/footer") %>

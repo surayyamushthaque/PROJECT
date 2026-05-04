@@ -35,6 +35,17 @@ const validateAddress = (body) => {
 
 const setFlash = (req, msg) => {
   req.session.addressMessage = msg;
+  req.session.flash = {
+    type: msg.type === "success" ? "success" : "error",
+    title: msg.type === "success" ? "Success" : "Error",
+    text: msg.text,
+  };
+};
+
+const getHeaderUser = (req) => {
+  const s = req.session?.user;
+  if (!s) return null;
+  return { ...s, name: s.name || s.username };
 };
 
 export const listAddressesPage = async (req, res) => {
@@ -49,6 +60,7 @@ export const listAddressesPage = async (req, res) => {
     return res.render("user/profile/settingaddres", {
       addresses: user?.addresses || [],
       message,
+      user: getHeaderUser(req),
     });
   } catch (err) {
     return res.status(500).send(err.message);
@@ -96,7 +108,7 @@ export const editAddressPage = async (req, res) => {
     const message = req.session.addressMessage || null;
     req.session.addressMessage = null;
 
-    return res.render("user/profile/editAddress", { address, message });
+    return res.render("user/profile/editAddress", { address, message, user: getHeaderUser(req) });
   } catch (err) {
     return res.status(500).send(err.message);
   }

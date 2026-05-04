@@ -13,6 +13,12 @@ const normalizeEmail = (email) => (email || "").trim().toLowerCase();
 const generateOtp = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
 
+const getHeaderUser = (req) => {
+  const s = req.session?.user;
+  if (!s) return null;
+  return { ...s, name: s.name || s.username };
+};
+
 export const getProfile = async (req, res) => {
   try {
     const userId = getSessionUserId(req);
@@ -45,7 +51,11 @@ export const getEditProfile = async (req, res) => {
     const changePasswordMessage = req.session.changePasswordMessage || null;
     req.session.changePasswordMessage = null;
 
-    res.render("user/profile/editProfile", { user, changePasswordMessage });
+    res.render("user/profile/editProfile", {
+      user,
+      changePasswordMessage,
+      headerUser: getHeaderUser(req),
+    });
 
   } catch (err) {
     res.status(500).send(err.message);
@@ -107,7 +117,7 @@ export const updateProfile = async (req, res) => {
 export const changePassword = async (req, res) => {
   const message = req.session.changePasswordMessage || null;
   req.session.changePasswordMessage = null;
-  return res.render("user/profile/changePassword", { message });
+  return res.render("user/profile/changePassword", { message, user: getHeaderUser(req) });
 };
 
 export const postChangePassword = async (req, res) => {
@@ -120,26 +130,20 @@ export const postChangePassword = async (req, res) => {
     const confirmPassword = (req.body?.confirmPassword || "").trim();
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      req.session.changePasswordMessage = {
-        type: "error",
-        text: "All fields are required.",
-      };
+      req.session.flash = { type: "error", title: "Validation error", text: "All fields are required." };
+      req.session.changePasswordMessage = { type: "error", text: "All fields are required." };
       return res.redirect("/user/profile/change-password");
     }
 
     if (newPassword.length < 8) {
-      req.session.changePasswordMessage = {
-        type: "error",
-        text: "New password must be at least 8 characters.",
-      };
+      req.session.flash = { type: "error", title: "Weak password", text: "New password must be at least 8 characters." };
+      req.session.changePasswordMessage = { type: "error", text: "New password must be at least 8 characters." };
       return res.redirect("/user/profile/change-password");
     }
 
     if (newPassword !== confirmPassword) {
-      req.session.changePasswordMessage = {
-        type: "error",
-        text: "New password and confirm password do not match.",
-      };
+      req.session.flash = { type: "error", title: "Mismatch", text: "New password and confirm password do not match." };
+      req.session.changePasswordMessage = { type: "error", text: "New password and confirm password do not match." };
       return res.redirect("/user/profile/change-password");
     }
 
@@ -154,10 +158,8 @@ export const postChangePassword = async (req, res) => {
 
     const isMatch = await bcrypt.compare(currentPassword, user.password || "");
     if (!isMatch) {
-      req.session.changePasswordMessage = {
-        type: "error",
-        text: "Incorrect current password.",
-      };
+      req.session.flash = { type: "error", title: "Incorrect password", text: "Your current password is incorrect." };
+      req.session.changePasswordMessage = { type: "error", text: "Incorrect current password." };
       return res.redirect("/user/profile/change-password");
     }
 
@@ -169,9 +171,9 @@ export const postChangePassword = async (req, res) => {
       type: "success",
       text: "Password updated successfully.",
     };
+    req.session.flash = { type: "success", title: "Success", text: "Password updated successfully." };
 
-    // Optional enhancement (logout after password change):
-    // req.session.destroy(() => res.redirect("/user/login"));
+    
     return res.redirect("/user/profile/change-password");
   } catch (err) {
     req.session.changePasswordMessage = {
@@ -233,7 +235,9 @@ export const sendEmailOtp = async (req, res) => {
 export const getVerifyEmailPage = async (req, res) => {
   const pendingEmail = req.session.pendingEmail;
   if (!pendingEmail) return res.redirect("/profile/edit");
-  return res.render("user/profile/settingEmail", { pendingEmail, error: null });
+  const s = req.session?.user;
+  const headerUser = s ? { ...s, name: s.name || s.username } : null;
+  return res.render("user/profile/settingEmail", { pendingEmail, error: null, user: headerUser });
 };
 
 // VERIFY OTP & UPDATE EMAIL
@@ -250,6 +254,7 @@ export const verifyEmailOtp = async (req, res) => {
       return res.status(400).render("user/profile/settingEmail", {
         pendingEmail: newEmail,
         error: "OTP is required",
+        user: req.session?.user ? { ...req.session.user, name: req.session.user.name || req.session.user.username } : null,
       });
     }
 
@@ -263,6 +268,7 @@ export const verifyEmailOtp = async (req, res) => {
       return res.status(400).render("user/profile/settingEmail", {
         pendingEmail: newEmail,
         error: "Invalid OTP",
+        user: req.session?.user ? { ...req.session.user, name: req.session.user.name || req.session.user.username } : null,
       });
     }
 
@@ -270,6 +276,7 @@ export const verifyEmailOtp = async (req, res) => {
       return res.status(400).render("user/profile/settingEmail", {
         pendingEmail: newEmail,
         error: "OTP expired",
+        user: req.session?.user ? { ...req.session.user, name: req.session.user.name || req.session.user.username } : null,
       });
     }
 

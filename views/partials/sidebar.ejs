@@ -1,0 +1,137 @@
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo">
+        <h2>CHRONIC</h2>
+    </div>
+    
+    <ul class="nav flex-column">
+        <li>
+            <a href="/admin/dashboard" class="nav-link <%= currentPage === 'dashboard' ? 'active' : '' %>">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="/admin/orders" class="nav-link <%= currentPage === 'orders' ? 'active' : '' %>">
+                <i class="fas fa-shopping-cart"></i> Orders
+            </a>
+        </li>
+        <li>
+            <a href="/admin/products" class="nav-link <%= currentPage === 'products' ? 'active' : '' %>">
+                <i class="fas fa-box"></i> Products
+            </a>
+        </li>
+        <li>
+            <a href="/admin/category" class="nav-link <%= currentPage === 'category' ? 'active' : '' %>">
+                <i class="fas fa-tags"></i> Category
+            </a>
+        </li>
+        <li>
+            <a href="/admin/users" class="nav-link <%= currentPage === 'users' ? 'active' : '' %>">
+                <i class="fas fa-users"></i> Users
+            </a>
+        </li>
+        <li>
+            <a href="/admin/banners" class="nav-link <%= currentPage === 'banners' ? 'active' : '' %>">
+                <i class="fas fa-image"></i> Banner Management
+            </a>
+        </li>
+        <li>
+            <a href="/admin/reviews" class="nav-link <%= currentPage === 'reviews' ? 'active' : '' %>">
+                <i class="fas fa-star"></i> Reviews
+            </a>
+        </li>
+        <li>
+            <a href="/admin/offers" class="nav-link <%= currentPage === 'offers' ? 'active' : '' %>">
+                <i class="fas fa-gift"></i> Offers
+            </a>
+        </li>
+    </ul>
+
+    <!-- Logout -->
+    <div class="sidebar-footer">
+        <a href="/admin/logout" class="nav-link text-danger">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</div>
+<style>
+   /* Sidebar & Header CSS */
+.sidebar {
+    background-color: #1a2236;
+    color: white;
+    width: 250px;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar .logo {
+    padding: 0 25px 30px 25px;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #00c4b4;
+    text-align: center;
+}
+
+.sidebar .nav-link {
+    color: #b0b7c9;
+    padding: 14px 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: #2a3450;
+    color: white;
+    border-left: 4px solid #00c4b4;
+}
+
+.sidebar .nav-link i {
+    width: 20px;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    padding: 0 15px;
+}
+
+.sidebar-footer .nav-link {
+    padding: 12px 25px;
+    border-radius: 8px;
+    margin: 0 10px;
+}
+
+/* Top Header */
+.top-header {
+    background: white;
+    padding: 15px 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-left: 250px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 100;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.main-content {
+    margin-left: 250px;
+    margin-top: 70px;
+    padding: 25px;
+} 
+</style>

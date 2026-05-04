@@ -197,7 +197,7 @@
 </style>
  
   
-  <%- include("../partials/headers", { title: "Signup", user: user }) %>
+  <%- include("../partials/header", { title: "Signup", user: user }) %>
   <div class="page-wrapper">
     <h1 class="welcome-text">Welcome !</h1>
 
@@ -229,9 +229,17 @@
         <a href="/user/signup">Sign up</a>
       </p>
       <a href="/user/forgot-password">Forgot Password?</a>
+       
+
+      <a href="/auth/google" class="btn btn-outline-dark w-100 mb-2">
+      <i class="fab fa-google"></i> Continue with Google
+    </a>
+
 
     </div>
   </div>
+    
+  
 
   <!-- FOOTER -->
   <footer class="footer">

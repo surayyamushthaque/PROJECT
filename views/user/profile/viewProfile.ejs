@@ -1,8 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>My Profile</title>
+<%- include("../../partials/header", { title: "My Addresses", user: user }) %>
+
 
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -143,15 +140,7 @@ nav a {
 
 <body>
 
-<!-- NAV -->
-<nav>
-  <div>CHRONIC</div>
-  <div>
-    <a href="/">Home</a>
-    <a href="/profile">Account</a>
-    <a href="/user/login">Logout</a>
-  </div>
-</nav>
+
 
 <div class="container">
 
@@ -196,7 +185,7 @@ nav a {
       </div>
     </div>
 
-    <!-- ADDRESS -->
+
     
 
   </div>
@@ -204,3 +193,5 @@ nav a {
 
 </body>
 </html>
+
+<%- include("../../partials/footer") %>

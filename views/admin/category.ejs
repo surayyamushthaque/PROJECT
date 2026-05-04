@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - CHRONIC Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+  
+ .sidebar {
+    background-color: #1a2236;
+    color: white;
+    width: 250px;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar .logo {
+    padding: 0 25px 30px 25px;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #00c4b4;
+    text-align: center;
+}
+
+.sidebar .nav-link {
+    color: #b0b7c9;
+    padding: 14px 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: #2a3450;
+    color: white;
+    border-left: 4px solid #00c4b4;
+}
+
+.sidebar .nav-link i {
+    width: 20px;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    padding: 0 15px;
+}
+
+.sidebar-footer .nav-link {
+    padding: 12px 25px;
+    border-radius: 8px;
+    margin: 0 10px;
+}
+
+/* Top Header */
+.top-header {
+    background: white;
+    padding: 15px 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-left: 250px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 100;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.main-content {
+    margin-left: 250px;
+    margin-top: 70px;
+    padding: 25px;
+}
+    </style> 
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <%- include("../partials/sidebar") %>
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+
+            <!-- Top Bar -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Category Management</h4>
+                <div class="d-flex align-items-center gap-3">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search Categories..." style="width: 300px;">
+                    <button class="btn btn-primary" onclick="searchCategories()">Search</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Add Category Form -->
+                <div class="col-lg-4">
+                    <div class="card p-4">
+                        <h5 class="mb-3">Add Category</h5>
+                        <form id="categoryForm">
+                            <div class="mb-3">
+                                <label class="form-label">Category Name</label>
+                                <input type="text" class="form-control" id="catName" placeholder="Enter Category Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" id="catDesc" rows="4" placeholder="Enter Category Description"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-teal w-100">
+                                <i class="fas fa-plus"></i> CREATE CATEGORY
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Categories Table -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0" id="categoryTable">
+                                <thead>
+                                    <tr>
+                                        <th>NAME</th>
+                                        <th>DESCRIPTION</th>
+                                        <th>OFFER PRICE</th>
+                                        <th>OFFER ACTIONS</th>
+                                        <th>STATUS</th>
+                                        <th>ACTIONS</th>
+                                        <th>EDIT</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoryBody">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Load categories on page load
+document.addEventListener('DOMContentLoaded', loadCategories);
+
+let categories = [];
+
+// Fetch categories from backend
+async function loadCategories() {
+    try {
+        const res = await fetch('/admin/api/categories');
+        categories = await res.json();
+        renderTable();
+    } catch (err) {
+        console.error('Error loading categories:', err);
+    }
+}
+
+// Render table
+function renderTable(filteredCategories = categories) {
+    const tbody = document.getElementById('categoryBody');
+    tbody.innerHTML = '';
+
+    filteredCategories.forEach(cat => {
+        const statusHTML = cat.status === 'listed' 
+            ? `<span class="status-listed">listed</span>`
+            : `<span class="status-unlisted">unlisted</span>`;
+
+        const row = `
+            <tr>
+                <td><strong>${cat.name}</strong></td>
+                <td>${cat.description || 'No description'}</td>
+                <td>${cat.offerPrice || '10%'} </td>
+                <td>
+                    <span class="offer-badge">${cat.offerAction || 'Add Offer'}</span>
+                </td>
+                <td>${statusHTML}</td>
+                <td>
+                    <button class="btn btn-sm ${cat.status === 'listed' ? 'btn-danger' : 'btn-success'}" 
+                            onclick="toggleStatus('${cat._id}', '${cat.status}')">
+                        ${cat.status === 'listed' ? 'unlist' : 'list'}
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-info text-white" onclick="editCategory('${cat._id}')">
+                        Edit
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}
+
+// Create new category
+document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('catName').value.trim();
+    const description = document.getElementById('catDesc').value.trim();
+
+    if (!name) return alert("Category name is required");
+
+    try {
+        const res = await fetch('/admin/api/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description })
+        });
+
+        if (res.ok) {
+            alert('Category created successfully!');
+            document.getElementById('categoryForm').reset();
+            loadCategories();
+        } else {
+            alert('Failed to create category');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Server error');
+    }
+});
+
+// Toggle list/unlist status
+async function toggleStatus(id, currentStatus) {
+    const newStatus = currentStatus === 'listed' ? 'unlisted' : 'listed';
+
+    try {
+        await fetch(`/admin/api/categories/${id}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        loadCategories();
+    } catch (err) {
+        alert('Failed to update status');
+    }
+}
+
+// Edit category (you can expand this)
+function editCategory(id) {
+    const cat = categories.find(c => c._id === id);
+    if (!cat) return;
+
+    const newName = prompt("Edit Category Name:", cat.name);
+    if (newName && newName.trim()) {
+        fetch(`/admin/api/categories/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName.trim(), description: cat.description })
+        }).then(() => loadCategories());
+    }
+}
+
+// Search functionality
+function searchCategories() {
+    const term = document.getElementById('searchInput').value.toLowerCase().trim();
+    if (!term) {
+        renderTable();
+        return;
+    }
+    const filtered = categories.filter(cat => 
+        cat.name.toLowerCase().includes(term) || 
+        (cat.description && cat.description.toLowerCase().includes(term))
+    );
+    renderTable(filtered);
+}
+</script>
+
+</body>
+</html>

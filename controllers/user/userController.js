@@ -15,7 +15,7 @@ import crypto from "crypto";
 
 
 export const landingPage = (req, res) => {
-  res.render("user/landing", { user: null })
+  res.render("user/home", { user: null })
 }
 
 
@@ -172,12 +172,22 @@ export const postLogin = async (req, res) => {
 
     const { email, password } = req.body
     const user = await User.findOne({ email })
+
     if (!user) {
       return res.status(400).json({
         success: false,
         error: "user not found"
       })
     }
+
+    
+     if(user.isBlocked){
+    return res.status(400).json({
+      success:false,
+      error:"user is blocked"
+    })
+   }
+
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
       return res.status(400).json({
@@ -185,7 +195,7 @@ export const postLogin = async (req, res) => {
         error: "Invalid Password"
       })
     }
-
+   
     req.session.user = {
       id: user._id,
       username: user.name

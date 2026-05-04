@@ -4,7 +4,7 @@ import userRoutes from "./routes/userRoutes.js"
 import session from "express-session"
 import passport from "./config/passport.js";
 import adminRoutes from "./routes/adminRoutes.js";
-
+import {checkBlocked} from "./middlewares/adminAuth.js"
 dotenv.config()
 
 const app = express()
@@ -39,12 +39,27 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/",userRoutes)
-app.use("/admin",adminRoutes)
+app.use(checkBlocked)
 app.use((req,res,next)=>{
-    res.locals.user=req.user||req.session.user
+    // Normalize session user shape for UI (navbar expects user.name)
+    const sessionUser = req.session?.user
+      ? { ...req.session.user, name: req.session.user.name || req.session.user.username }
+      : null;
+
+    res.locals.user = req.user || sessionUser;
+
+    // SweetAlert flash (one-time)
+    res.locals.flash = req.session?.flash || null;
+    if (req.session) req.session.flash = null;
+
+    // Admin UI helpers
+    res.locals.isAdmin = Boolean(req.session?.admin);
+
     next()
 })
+
+app.use("/",userRoutes)
+app.use("/admin",adminRoutes)
 
 
 

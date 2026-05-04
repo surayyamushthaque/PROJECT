@@ -12,6 +12,12 @@ async (accessToken, refreshToken, profile, done) => {
     const email = profile.emails[0].value;
 
     let user = await User.findOne({ email });
+      if(user){
+        if(user.isBlocked){
+          return done(null,false,{message:"User is blocked"})
+        }
+        return done(null,user)
+      }
 
     if (!user) {
       user = await User.create({
@@ -33,8 +39,17 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  const user = await User.findById(id);
-  done(null, user);
+  try{
+    const user =await User.findById(id);
+    if(!user){
+      return done(null, false)
+    }
+    done(null,user)
+  }catch(err){
+    done(err,null)
+  }
+  
+  
 });
 
 export default passport;
