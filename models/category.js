@@ -1,25 +1,34 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const categorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    image: {
+      type: String,
+      default: null,
     },
     offer: {
-      type: String,
-      default: null
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
     },
-    visibility: {
+    isListed: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
-  {
-    timestamps: true   // ✅ correct place
-  }
+  { timestamps: true }
 );
 
-const category = mongoose.model("category", categorySchema);
-export default category;
+export default mongoose.model('Category', categorySchema);
