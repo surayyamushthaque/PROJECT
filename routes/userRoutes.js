@@ -18,7 +18,7 @@ import {
 } from "../controllers/services/user/userprofilecontroller.js";
 import { getVerifyEmailPage } from "../controllers/services/user/userprofilecontroller.js";
 import profileAddress from "../controllers/services/user/addressController.js";
-
+// import {getProducts} from "../controllers/productController.js"
 
 router.get("/",usercontroller.landingPage)
 router.get("/user/signup",usercontroller.loadSignup)
@@ -41,11 +41,10 @@ router.post("/user/reset-password/:token",usercontroller.resetPassword)
 
 
 
-// router.get("/user/profile/edit", isLoggedIn, userprofile.getEditProfile);
 router.get("/user/profile", authMiddleware, userprofile.getProfile);
 router.get("/profile/edit",authMiddleware,userprofile.getEditProfile)
 router.post("/profile/edit",authMiddleware,userprofile.updateProfile)
-// 🔹 EMAIL OTP
+
 
 
 router.post("/profile/send-otp", isLoggedIn, sendEmailOtp);
@@ -54,11 +53,11 @@ router.get("/profile/verify-email", isLoggedIn, getVerifyEmailPage);
 
 
 
-// Change Password (preferred)
+
 router.get("/user/profile/change-password", isLoggedIn, changePassword);
 router.post("/user/profile/change-password", isLoggedIn, postChangePassword);
 
-// Backwards-compatible routes (keep existing links working)
+
 router.get("/change-password", isLoggedIn, changePassword);
 router.post("/change-password", isLoggedIn, postChangePassword);
 
@@ -67,18 +66,19 @@ router.post("/user/profile/edit", isLoggedIn, upload.single("profileImage"), upd
 
 
 
-// Address management (preferred)
 router.get("/user/addresses", isLoggedIn, profileAddress.listAddressesPage);
 router.post("/user/addresses/add", isLoggedIn, profileAddress.addAddress);
 router.get("/user/addresses/edit/:id", isLoggedIn, profileAddress.editAddressPage);
 router.post("/user/addresses/edit/:id", isLoggedIn, profileAddress.updateAddress);
 router.post("/user/addresses/delete/:id", isLoggedIn, profileAddress.deleteAddress);
 
-// Backwards-compatible aliases (keep existing links working)
+
 router.get("/address", isLoggedIn, profileAddress.listAddressesPage);
 router.post("/add", isLoggedIn, profileAddress.addAddress);
 router.get("/address/edit/:id", isLoggedIn, profileAddress.editAddressPage);
 router.post("/address/edit/:id", isLoggedIn, profileAddress.updateAddress);
 router.post("/address/delete/:id", isLoggedIn, profileAddress.deleteAddress);
+
+
 
 export default router

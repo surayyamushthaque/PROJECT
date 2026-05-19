@@ -1,37 +1,12 @@
 import User from "../../../models/user.js";
+import { validateAddress } from "../../../utils/addressValidation.js";
 
 const getSessionUserId = (req) =>
   req.session.user?._id || req.session.user?.id || req.user?.id;
 
 const normalize = (v) => (v || "").toString().trim();
 
-const validateAddress = (body) => {
-  const name = normalize(body?.name);
-  const phone = normalize(body?.phone);
-  const street = normalize(body?.street);
-  const city = normalize(body?.city);
-  const state = normalize(body?.state);
-  const pincode = normalize(body?.pincode);
-  const country = normalize(body?.country);
-  const landmark = normalize(body?.landmark);
 
-  if (!name || !phone || !street || !city || !state || !pincode || !country) {
-    return { ok: false, message: "Please fill all required fields." };
-  }
-
-  if (!/^\+?[0-9]{10,15}$/.test(phone)) {
-    return { ok: false, message: "Phone number is invalid." };
-  }
-
-  if (!/^[0-9]{4,10}$/.test(pincode)) {
-    return { ok: false, message: "Pincode/ZIP must be numeric." };
-  }
-
-  return {
-    ok: true,
-    value: { name, phone, street, city, state, pincode, country, landmark },
-  };
-};
 
 const setFlash = (req, msg) => {
   req.session.addressMessage = msg;

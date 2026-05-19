@@ -4,10 +4,7 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import passport from "passport";
 import dotenv from "dotenv";
-import {
-  getUsersService,
-  toggleBlockUserService,
-} from "../services/admin/user-service.js";
+import {getUsersService,toggleBlockUserService} from "../services/admin/user-service.js";
 import { error } from "console";
 dotenv.config();
 
@@ -25,7 +22,7 @@ export const loadLogin = (req, res) => {
 
 export const adminLogin = (req, res) => {
   try {
-    console.log(req.body)
+    // console.log(req.body)
     const { email, password } = req.body;
     if (email === "admin@gmail.com" && password === "1234") {
       req.session.admin = true;
@@ -44,7 +41,7 @@ export const loadDashboard = (req, res) => {
     if (!req.session.admin) {
       return res.redirect("/login");
     }
-    res.render("admin/dashboard");
+    res.render("admin/dashboard",{currentPage:"dashboard"});
   } catch (err) {
     console.log(err);
     res.status(500).send("Server Error");
@@ -139,7 +136,7 @@ export const getUsers = async (req, res) => {
     const total = await User.countDocuments(filter);
     const totalPages = Math.max(1, Math.ceil(total / limit));
 
-    console.log(users);
+    // console.log(users);
 
     res.render("admin/users", {
       search,
@@ -199,17 +196,6 @@ export const loadCategory = async(req,res)=>{
   }
 }
 
-export const loadProductManager =async(req,res)=>{
-  try{
-    if(!req.session.admin){
-      res.redirect("/admin/login")
-    }
-    res.render("admin/productmanager")
-  }catch(err){
-    res.status(500).send("server error")
-  }
-}
-
 export default {
   adminLogin,
   loadLogin,
@@ -222,5 +208,5 @@ export default {
   unblockUser,
   blockUser,
   loadCategory,
-   loadProductManager
+  
 };

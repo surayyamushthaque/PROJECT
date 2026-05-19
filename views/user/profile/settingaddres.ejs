@@ -1,5 +1,10 @@
 <%- include("../../partials/header", { title: "My Addresses", user: user }) %>
-
+ <style>
+  body{
+     background: #c88989;
+  }
+   
+ </style>
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
   <div class="card shadow-lg p-4" style="width: 900px; max-width: 95vw; border-radius: 15px;">
 
@@ -63,37 +68,37 @@
         <form id="addressForm" method="POST" action="/user/addresses/add" onsubmit="return validateAddressForm()">
           <div class="mb-2">
             <label>Full Name</label>
-            <input type="text" name="name" class="form-control" placeholder="Full Name" required>
+            <input type="text" name="name" class="form-control" placeholder="Full Name" >
             <small class="text-danger" id="err-name"></small>
           </div>
           <div class="mb-2">
             <label>Phone</label>
-            <input type="text" name="phone" class="form-control" placeholder="Phone" required>
+            <input type="text" name="phone" class="form-control" placeholder="Phone" >
             <small class="text-danger" id="err-phone"></small>
           </div>
           <div class="mb-2">
             <label>Address Line (Street)</label>
-            <input type="text" name="street" class="form-control" placeholder="Street" required>
+            <input type="text" name="street" class="form-control" placeholder="Street" >
             <small class="text-danger" id="err-street"></small>
           </div>
           <div class="mb-2">
             <label>City</label>
-            <input type="text" name="city" class="form-control" placeholder="City" required>
+            <input type="text" name="city" class="form-control" placeholder="City" >
             <small class="text-danger" id="err-city"></small>
           </div>
           <div class="mb-2">
             <label>State</label>
-            <input type="text" name="state" class="form-control" placeholder="State" required>
+            <input type="text" name="state" class="form-control" placeholder="State" >
             <small class="text-danger" id="err-state"></small>
           </div>
           <div class="mb-2">
             <label>Pincode / ZIP</label>
-            <input type="text" name="pincode" class="form-control" placeholder="Pincode / ZIP" required>
+            <input type="text" name="pincode" class="form-control" placeholder="Pincode / ZIP" >
             <small class="text-danger" id="err-pincode"></small>
           </div>
           <div class="mb-2">
             <label>Country</label>
-            <input type="text" name="country" class="form-control" placeholder="Country" required>
+            <input type="text" name="country" class="form-control" placeholder="Country" >
             <small class="text-danger" id="err-country"></small>
           </div>
           <div class="mb-2">
@@ -114,52 +119,179 @@ let modal;
 function openModal() {
   const el = document.getElementById("addressModal");
   modal = bootstrap.Modal.getOrCreateInstance(el);
-  document.getElementById("addressForm").reset();
-  ["name","phone","street","city","state","pincode","country"].forEach(k => {
-    const e = document.getElementById("err-" + k);
-    if (e) e.textContent = "";
-  });
-  modal.show();
-}
-function closeModal() {
-  if (modal) modal.hide();
-}
-
-function validateAddressForm() {
-  const form = document.getElementById("addressForm");
-  const phone = (form.phone.value || "").trim();
-  const pin = (form.pincode.value || "").trim();
-
-  document.getElementById("err-phone").textContent = "";
-  document.getElementById("err-pincode").textContent = "";
-
-  let ok = true;
-  if (!/^\+?[0-9]{10,15}$/.test(phone)) {
-    document.getElementById("err-phone").textContent = "Enter a valid phone number";
-    ok = false;
-  }
-  if (!/^[0-9]{4,10}$/.test(pin)) {
-    document.getElementById("err-pincode").textContent = "Pincode / ZIP must be numeric";
-    ok = false;
-  }
-  return ok;
-}
-
-document.querySelectorAll(".js-delete-address").forEach((form) => {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!window.Swal) return form.submit();
-    const result = await Swal.fire({
-      icon: "warning",
-      title: "Delete address?",
-      text: "This action cannot be undone.",
-      showCancelButton: true,
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#000",
+  const form = document.getElementById("addressForm")
+  form.reset()
+  document.querySelectorAll(".error-text").forEach((el) => {
+    el.textContent ="";})
+  
+   document.querySelectorAll(".error-text").forEach((el) => {
+        el.textContent = "";
     });
-    if (result.isConfirmed) form.submit();
-  });
+    modal.show()
+  }
+
+ function closeModal(){
+  if(modal)modal.hide()
+ }
+
+ function validateAddressForm(form){
+  let isValid = true;
+ 
+  const name = form.name.value.trim();
+    const phone = form.phone.value.trim();
+    const street = form.street.value.trim();
+    const city = form.city.value.trim();
+    const state = form.state.value.trim();
+    const pincode = form.pincode.value.trim();
+    const country = form.country.value.trim();
+document.querySelectorAll(".error-text").forEach((el)=>{
+  el.textContent = "";
+})
+
+if(name.length<3){
+  document.getElementById("err-name").textContent="Name must be at least 3 characters";
+  isValid = false;
+}
+
+if(!/^\+?[0-9]{10,15}$/.test(phone)){
+  document.getElementById("err-phone").textContent = "Enter a valid phone number";
+  isValid = false;
+}
+
+if(street.length<5){
+  document.getElementById("err-street").textContent = "Enter a valid street address"
+  isValid= false
+}
+
+if(!/^[a-zA-Z\s]{2,50}$/.test(city)){
+  document.getElementById("err-city").textContent = "Enter a valid city name";
+  isValid = false
+}
+
+if(!/^[a-zA-Z\s]{2,50}$/.test(city)){
+  document.getElementById("err-city").textContent = "Enter a valid city name";
+  isValid = false
+}
+
+if(!/^[0-9]{4,10}$/.test(pincode)){
+  document.getElementById("err-pincode").textContent = "pincode/ZIP must be numeric"
+  isValid = false
+}
+// 
+ return isValid
+ }
+document
+    .getElementById("addressForm")
+    .addEventListener("submit", async function (e) {
+
+        e.preventDefault();
+
+        const form = this;
+
+        // Validate form
+        if (!validateAddressForm(form)) {
+            return;
+        }
+
+        // FormData
+        const formData = new FormData(form);
+
+        try {
+
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: data.message || "Address saved successfully",
+                });
+
+                closeModal();
+
+                // Optional reload
+                location.reload();
+
+            } else {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.message || "Something went wrong",
+                });
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Server error occurred",
+            });
+        }
+    });
+
+
+    document.querySelectorAll(".js-delete-address").forEach((form)=>{
+      form.addEventListener("submit",async(e)=>{
+        e.preventDefault();
+        const result = await Swal.fire({
+          icon:"warning",
+          title:"Delete address?",
+          text:"This action cannot be undone.",
+          showCancelButton:true,
+          confirmButtonText:"Delete",
+          cancelButtonText:"cancel",
+          confirmButtonColor:"#000"
+        })
+        if(!result.isConfirmed) return
+
+        try {
+
+            const response = await fetch(form.action, {
+                method: "POST",
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Deleted",
+                    text: data.message || "Address deleted",
+                });
+
+                location.reload();
+
+            } else {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.message || "Delete failed",
+                });
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Server error occurred",
+            });
+        }
+    });
 });
 </script>
 

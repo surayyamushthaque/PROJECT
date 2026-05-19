@@ -13,7 +13,7 @@
       <div class="text-center mb-3">
         <img id="preview" src="<%= user.profileImage || '/images/avatar.png' %>" style="width:90px;height:90px;border-radius:50%;object-fit:cover;">
         <div class="mt-2">
-          <input type="file" name="profileImage" accept="image/*" onchange="previewImage(event)" class="form-control">
+          <input type="file" name="profileImage" accept="image/image/jpeg, image/jpg" onchange="previewImage(event)" class="form-control">
         </div>
       </div>
 
@@ -47,12 +47,19 @@
 
 <script>
 function previewImage(event) {
-  const reader = new FileReader();
-  reader.onload = function() {
-    document.getElementById('preview').src = reader.result;
-  }
-  reader.readAsDataURL(event.target.files[0]);
-}
+    const file = event.target.files[0];
+  
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please select a valid image file.");
+
+
+        event.target.value = "";
+        return;
+    }
+
+   } console.log("Valid image selected:", file.name);
 
 function sendOtp() {
   const email = document.getElementById("email").value;
