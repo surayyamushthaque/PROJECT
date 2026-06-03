@@ -95,9 +95,9 @@ export const dashboardData = (req, res) => {
 
 export const isAdmin = (req, res, next) => {
   if (req.session.admin) {
-    next();
+   return  next();
   } else {
-    res.redirect("admin/login");
+    res.redirect("/admin/login");
   }
 };
 

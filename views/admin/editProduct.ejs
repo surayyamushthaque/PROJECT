@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+        .container { margin-left: 270px; padding: 30px; }
+        .form-wrapper { background: white; padding: 30px; border-radius: 12px; max-width: 1000px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { margin-bottom: 25px; color: #1f2937; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: #2563eb; }
+        .row { display: flex; gap: 20px; }
+        .row .form-group { flex: 1; }
+        .image-upload-section { margin-top: 25px; padding: 20px; background: #f9fafb; border-radius: 12px; }
+        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px; }
+        .image-card { border: 2px dashed #d1d5db; padding: 20px; border-radius: 12px; background: white; }
+        .image-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+        .submit-btn { width: 100%; padding: 14px; border: none; background: #2563eb; color: white; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+        .submit-btn:hover { background: #1d4ed8; }
+        .back-btn { margin-top: 15px; padding: 12px 20px; border: none; background: #6b7280; color: white; border-radius: 8px; cursor: pointer; font-size: 15px; }
+        .error { color: red; font-size: 13px; margin-top: 5px; display: block; }
+    </style>
+</head>
+<body>
+
+<%- include("../partials/sidebar") %>
+
+<div class="container">
+    <div class="form-wrapper">
+        <h2>Edit Product</h2>
+
+        <form id="productForm" action="/admin/edit-product/<%= product._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" name="productName" value="<%= product.productName %>">
+                <small class="error" id="nameError"></small>
+            </div>
+
+            <div class="form-group">
+                <label>Brand</label>
+                <input type="text" name="brand" value="<%= product.brand %>">
+                <small class="error" id="brandError"></small>
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category">
+                    <% categories.forEach(cat => { %>
+                        <option value="<%= cat._id %>"
+                            <%= cat._id.toString() === product.category._id.toString() ? "selected" : "" %>>
+                            <%= cat.name %>
+                        </option>
+                    <% }) %>
+                </select>
+                <small class="error" id="categoryError"></small>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>Sale Price</label>
+                    <input type="number" name="salePrice" value="<%= product.salePrice %>">
+                    <small class="error" id="salePriceError"></small>
+                </div>
+                <div class="form-group">
+                    <label>Offer Price (%)</label>
+                    <input type="number" name="offerPrice" value="<%= product.offerPrice %>">
+                    <small class="error" id="offerPriceError"></small>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" value="<%= product.quantity %>">
+                    <small class="error" id="quantityError"></small>
+                </div>
+                <div class="form-group">
+                    <label>Regular Price</label>
+                    <input type="number" name="regularPrice" value="<%= product.regularPrice %>">
+                    <small class="error" id="regularPriceError"></small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="5"><%= product.description %></textarea>
+                <small class="error" id="descriptionError"></small>
+            </div>
+
+            <div class="form-group">
+                <label>Color</label>
+                <input type="text" name="color" value="<%= product.color %>">
+            </div>
+
+            <!-- EXISTING IMAGES -->
+            <div class="image-upload-section">
+                <h3>Current Images</h3>
+                <div class="image-grid">
+                    <% product.productImage.forEach(img => { %>
+                        <div class="image-card">
+                            <img src="<%= img %>" alt="Product Image">
+                        </div>
+                    <% }) %>
+                </div>
+
+                <h3 style="margin-top: 20px">Replace Images (optional)</h3>
+                <div class="image-grid">
+                    <div class="image-card">
+                        <label>Image 1</label>
+                        <input type="file" name="images" accept="image/*">
+                    </div>
+                    <div class="image-card">
+                        <label>Image 2</label>
+                        <input type="file" name="images" accept="image/*">
+                    </div>
+                    <div class="image-card">
+                        <label>Image 3</label>
+                        <input type="file" name="images" accept="image/*">
+                    </div>
+                    <div class="image-card">
+                        <label>Image 4</label>
+                        <input type="file" name="images" accept="image/*">
+                    </div>
+                </div>
+                <small class="error" id="imageError"></small>
+            </div>
+
+            <button type="submit" class="submit-btn">Save Changes</button>
+            <button type="button" class="back-btn"
+                onclick="window.location.href='/admin/productmanager'">
+                &#8592; Back to Products
+            </button>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById("productForm");
+    let formSubmitting = false;
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        if (formSubmitting) return;
+
+        let isValid = true;
+        clearErrors();
+
+        const productName = document.querySelector('[name="productName"]').value.trim();
+        const brand = document.querySelector('[name="brand"]').value.trim();
+        const category = document.querySelector('[name="category"]').value;
+        const salePrice = document.querySelector('[name="salePrice"]').value;
+        const offerPrice = document.querySelector('[name="offerPrice"]').value;
+        const quantity = document.querySelector('[name="quantity"]').value;
+        const regularPrice = document.querySelector('[name="regularPrice"]').value;
+        const description = document.querySelector('[name="description"]').value.trim();
+
+        if (productName === "") {
+            showError("nameError", "Product name is required");
+            isValid = false;
+        } else if (productName.length < 3) {
+            showError("nameError", "Minimum 3 characters required");
+            isValid = false;
+        }
+
+        if (brand === "") {
+            showError("brandError", "Brand is required");
+            isValid = false;
+        }
+
+        if (category === "") {
+            showError("categoryError", "Please select category");
+            isValid = false;
+        }
+
+        if (salePrice === "") {
+            showError("salePriceError", "Sale price is required");
+            isValid = false;
+        } else if (salePrice <= 0) {
+            showError("salePriceError", "Price must be greater than 0");
+            isValid = false;
+        }
+
+        if (offerPrice !== "" && (offerPrice < 0 || offerPrice > 100)) {
+            showError("offerPriceError", "Offer must be between 0 and 100");
+            isValid = false;
+        }
+
+        if (quantity === "") {
+            showError("quantityError", "Quantity is required");
+            isValid = false;
+        } else if (quantity <= 0) {
+            showError("quantityError", "Quantity must be greater than 0");
+            isValid = false;
+        }
+
+        if (regularPrice !== "" && regularPrice <= 0) {
+            showError("regularPriceError", "Invalid regular price");
+            isValid = false;
+        }
+
+        if (description === "") {
+            showError("descriptionError", "Description is required");
+            isValid = false;
+        } else if (description.length < 10) {
+            showError("descriptionError", "Minimum 10 characters required");
+            isValid = false;
+        }
+
+        if (isValid) {
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: "Product updated successfully",
+                confirmButtonColor: "#2563eb"
+            }).then(() => {
+                formSubmitting = true;
+                form.submit();
+            });
+        }
+    });
+
+    function showError(id, message) {
+        document.getElementById(id).innerText = message;
+    }
+
+    function clearErrors() {
+        document.querySelectorAll(".error").forEach(e => e.innerText = "");
+    }
+</script>
+
+</body>
+</html>

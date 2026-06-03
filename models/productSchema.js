@@ -12,9 +12,19 @@ const productSchema = new mongoose.Schema(
         required: true,
     },
 
-    price: {
+    salePrice: {
         type: Number,
         required: true,
+    },
+
+    regularPrice: {
+        type: Number,
+        default: 0,
+    },
+
+    offerPrice: {
+        type: Number,
+        default: 0,
     },
 
     category: {
@@ -32,14 +42,14 @@ const productSchema = new mongoose.Schema(
         type: [String],
         required: true,
     },
-    offer:{
-        type:Number,
-        default:0
 
+    brand: {
+        type: String,
+        required: true,
     },
-    brand:{
-        type:String,
-        required:true
+
+    color: {
+        type: String,
     },
 
     isBlocked: {
@@ -51,10 +61,9 @@ const productSchema = new mongoose.Schema(
         type: Boolean,
         default: false,
     },
+
 },
 { timestamps: true }
 );
 
-const Product = mongoose.model("Product", productSchema);
-
-export default Product;
+export default mongoose.model("Product", productSchema);

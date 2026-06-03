@@ -11,35 +11,67 @@ export const addCategory= async(req,res)=>{
             res.status(500).json({error:err.message})
      }
 }
+export const updateCategory = async (req, res) => {
+    try {
+        
 
-export const updateCategory = async(req,res)=>{
-    try{
-        const category = await category.findByIdAndUpdate(
-            req.params.id,req.body,{new:true}
-        )
-        res.json(category)
-    }catch(err){
-        res.status(500).json({error:err.message})
+        const category = await Category.findByIdAndUpdate(
+            req.params.id,
+            {
+                name: req.body.name,
+                description: req.body.description
+            },
+            { new: true }
+        );
+        
+
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Category updated successfully",
+            data: category
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
-
-}
+};
 
 export const deleteCategory = async(req,res)=>{
     try{
-        await category.findByIdAndUpdate(req.params.id,{
+        await Category.findByIdAndUpdate(req.params.id,{
             isDeleted:true,
         })
-        res.json({message:"Category deleted (soft)"})
+
+        return res.json({
+            message:"Category deleted (soft)"
+        })
+
     }catch(err){
-        res.status(500).json({error:err.message})
+        return res.status(500).json({
+            error:err.message
+        })
     }
 }
 
 export const getCategory = async (req,res)=>{
+     
     try{
         const {search = "", page=1,limit = 5}=req.query
         const query = {
-           isListed: true,
+          
             name:{$regex:search,$options:"i"},
         }
         const categories = await Category.find(query)
@@ -47,15 +79,50 @@ export const getCategory = async (req,res)=>{
         .skip((page-1)*limit)
         .limit(Number(limit))
         const total = await Category.countDocuments(query)
-        console.log(categories)
+        
         res.status(200).json({data:categories,total,page:Number(page),pages:Math.ceil(total/limit)})
     }catch(err){
         res.status(500).json({error:err.message})
     }
 }
 
+ export const toggleCategoryStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const isListed = status === "listed";
+
+        const category = await Category.findByIdAndUpdate(
+            id,
+            { isListed }
+        );
+
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Category status updated",
+            data: category
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
 export default{
     getCategory,
+    toggleCategoryStatus,
      deleteCategory,
      updateCategory,
      addCategory

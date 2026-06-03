@@ -10,8 +10,11 @@ const categorySchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      trim: true,
-      default: '',
+      status: {
+        type: String,
+        enum: ['listed', 'unlisted'],
+        default: 'listed'
+    }
     },
     image: {
       type: String,

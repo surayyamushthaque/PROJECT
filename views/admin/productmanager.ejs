@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Product Management</title>
+
   <link rel="stylesheet" href="/css/sidebar.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
     * {
       margin: 0;
@@ -14,69 +17,57 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f0f2f5;
-      color: #333;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+    }
+
+    .sidebar {
+      width: 250px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      min-height: 100vh;
     }
 
     .container {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 0 20px;
+      margin-left: 270px;
+      padding: 30px;
     }
 
     h1 {
-      font-size: 28px;
-      font-weight: 600;
       margin-bottom: 20px;
-      color: #1f2937;
     }
 
     .search-bar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
       background: white;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      margin-bottom: 25px;
-      display: flex;
-      gap: 15px;
-      align-items: center;
     }
 
     .search-input {
       flex: 1;
-      padding: 12px 20px;
+      padding: 12px;
       border: 1px solid #ddd;
       border-radius: 8px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    .search-input:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
     .search-btn {
-      padding: 12px 28px;
+      padding: 12px 24px;
       background: #2563eb;
       color: white;
       border: none;
       border-radius: 8px;
-      font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .search-btn:hover {
-      background: #1d4ed8;
+      text-decoration: none;
     }
 
     .table-container {
       background: white;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     }
 
     table {
@@ -85,224 +76,287 @@
     }
 
     th {
-      background: linear-gradient(90deg, #3b82f6, #2563eb);
+      background: #2563eb;
       color: white;
-      padding: 16px 12px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 14px;
+      padding: 15px;
     }
 
     td {
-      padding: 16px 12px;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-    }
-
-    tr:hover {
-      background-color: #f8fafc;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
     }
 
     .btn {
-      padding: 6px 14px;
+      padding: 8px 14px;
       border: none;
       border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
+      color: white;
       cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .btn-add {
-      background: #10b981;
-      color: white;
-    }
-
-    .btn-add:hover {
-      background: #059669;
-    }
-
-    .btn-block {
-      background: #64748b;
-      color: white;
-    }
-
-    .btn-block:hover {
-      background: #475569;
     }
 
     .btn-edit {
-      background: #eab308;
-      color: white;
-    }
-
-    .btn-edit:hover {
-      background: #ca8a04;
+      background: #f59e0b;
     }
 
     .btn-delete {
       background: #ef4444;
-      color: white;
-    }
-
-    .btn-delete:hover {
-      background: #dc2626;
-    }
-
-    .status {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .pagination {
-      margin-top: 25px;
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .page-btn {
-      padding: 8px 14px;
-      border: 1px solid #cbd5e1;
-      background: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .page-btn.active {
-      background: #2563eb;
-      color: white;
-      border-color: #2563eb;
     }
 
     .offer-price {
       color: #10b981;
       font-weight: 600;
     }
-    body {
-    margin: 0;
-    padding: 0;
-    background-color: #f0f2f5;
-      }
-
-   .sidebar {
-    background-color: #1a2236;
-    color: white;
-    width: 250px;
-    min-height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-   }
-
-  .container {
-    margin-left: 270px;
-    padding: 20px;
-}
   </style>
 </head>
+
 <body>
-   <%- include("../partials/sidebar") %>
 
-  <div class="container">
-    <h1>Product Management</h1>
+  <%- include("../partials/sidebar") %>
 
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <input 
-        type="text" 
-        class="search-input" 
-        placeholder="Search Products or Brands..."
-        id="searchInput"
-      />
-      <button class="search-btn" onclick="searchProducts()">Search</button>
-       <a href="/admin/products">
-        Clear
-    </a>
+    <div class="container">
+
+      <h1>Product Management</h1>
+
+      <div class="search-bar">
+
+        <input type="text" class="search-input" id="searchInput" placeholder="Search products...">
+
+        <button class="search-btn" onclick="searchProducts()">
+          Search
+        </button>
+
+        <a href="/admin/products" class="search-btn">
+          Clear
+        </a>
+
+        <a href="/admin/addProduct" class="search-btn">
+          + Add Product
+        </a>
+
+      </div>
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Product</th>
+              <th>Brand</th>
+              <th>Category</th>
+              <th>Sale Price</th>
+              <th>Offer</th>
+              <th>Quantity</th>
+              <th>Edit</th>
+              <th>Delete</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="productTable">
+            <tbody id="productBody"></tbody>
+
+         <tbody>
+
+<% products.forEach(product => { %>
+
+<tr>
+
+    <td>
+        <strong><%= product.productName %></strong>
+    </td>
+
+    <td>
+        <%= product.brand %>
+    </td>
+
+    <td>
+        <%= product.category?.name || "No Category" %>
+    </td>
+
+    <td>
+        ₹<%= product.salePrice %>
+    </td>
+
+    <td class="offer-price">
+        <%= product.offerPrice %>%
+    </td>
+
+    <td>
+        <%= product.quantity %>
+    </td>
+
+    <td>
+
+        <a
+            href="/admin/edit-product/<%= product._id %>"
+            class="btn btn-edit">
+
+            Edit
+
+        </a>
+
+    </td>
+
+    <td>
+
+        <button
+            class="btn btn-delete"
+            onclick="deleteProduct('<%= product._id %>')">
+
+            Delete
+
+        </button>
+
+    </td>
+
+</tr>
+
+<% }) %>
+
+</tbody>
+
+        </table>
+
+      </div>
+
     </div>
-     
 
-    <!-- Table -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>ProductName</th>
-            <th>Brand</th>
-            <th>Category</th>
-            <th>Sale Price</th>
-            <th>Offer Price</th>
-            <th>Offer Actions</th>
-            <th>Quantity</th>
-            <th>Status</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody id="productTable">
-          <% products.forEach(product => { %>
-          <tr>
-            <td><%= product.name %></td>
-            <td><%= product.brand %></td>
-            <td><%= product.category %></td>
-            <td>₹<%= product.salePrice.toLocaleString('en-IN') %></td>
-            <td class="offer-price"><%= product.offerPrice %>%</td>
-            <td>
-              <button class="btn btn-add" onclick="addOffer('<%= product.id %>')">
-                Add Offer
-              </button>
-            </td>
-            <td><%= product.quantity %></td>
-            <td>
-              <button class="btn btn-block">Block</button>
-            </td>
-            <td>
-              <button class="btn btn-edit" onclick="editProduct('<%= product.id %>')">Edit</button>
-            </td>
-            <td>
-              <button class="btn btn-delete" onclick="deleteProduct('<%= product.id %>')">Delete</button>
-            </td>
-          </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    </div>
+    <script>
+        
+      let products = [];
 
-    <!-- Pagination -->
-    <div class="pagination">
-      <button class="page-btn">1</button>
-      <button class="page-btn active">2</button>
-      <button class="page-btn">Next</button>
-    </div>
-  </div>
+document.addEventListener("DOMContentLoaded", loadProducts);
 
-  <script>
-    function searchProducts() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const rows = document.querySelectorAll('#productTable tr');
+async function loadProducts() {
+    try {
+
+        const response = await fetch("/admin/products");
+
+        const result = await response.json();
+
+        products = result.data;
+
+        renderTable();
+
+    } catch (error) {
+
+        console.error("Error loading products:", error);
+
+    }
+}      
       
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(query) ? '' : 'none';
-      });
-    }
 
-    function addOffer(id) {
-      alert(`Add offer for product ID: ${id}`);
-      // You can redirect or open modal here
-    }
+     function renderTable(filteredProducts = products) {
 
-    function editProduct(id) {
-      Swal.fire("product edited successfully")
-    }
+    const tbody = document.getElementById("productBody");
 
-    function deleteProduct(id) {
-      if (confirm('Are you sure you want to delete this product?')) {
-        alert(`Product ${id} deleted`);
-      }
+    tbody.innerHTML = "";
+
+    filteredProducts.forEach(product => {
+
+        const row = `
+            <tr>
+                <td>${product.productName}</td>
+
+                <td>${product.brand}</td>
+
+                <td>${product.category}</td>
+
+                <td>₹${product.salePrice}</td>
+
+                <td class="offer-price">
+                    ${product.offerPrice || 0}%
+                </td>
+
+                <td>${product.quantity}</td>
+
+                <td>
+                    <a href="/admin/edit-product/${product._id}"
+                       class="btn btn-edit">
+                        Edit
+                    </a>
+                </td>
+
+                <td>
+                    <button
+                        class="btn btn-delete"
+                        onclick="deleteProduct('${product._id}')">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+
+        tbody.innerHTML += row;
+
+    });
+}
+
+      function searchProducts() {
+
+    const query = document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const filtered = products.filter(product =>
+        product.productName.toLowerCase().includes(query) ||
+        product.brand.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query)
+    );
+
+    renderTable(filtered);
+}async function deleteProduct(id) {
+
+    const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Product will be deleted!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Delete"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+
+        const response = await fetch(
+            `/admin/delete-product/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            Swal.fire(
+                "Deleted!",
+                "Product deleted successfully",
+                "success"
+            );
+
+            loadProducts();
+
+        }
+
+    } catch (error) {
+
+        Swal.fire(
+            "Error",
+            "Failed to delete product",
+            "error"
+        );
+
     }
-  </script>
+}
+
+    </script>
+
 </body>
+
 </html>

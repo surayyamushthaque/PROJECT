@@ -1,5 +1,6 @@
-import express from "express"
 import dotenv from "dotenv"
+import express from "express"
+
 import userRoutes from "./routes/userRoutes.js"
 import session from "express-session"
 import passport from "./config/passport.js";
@@ -68,6 +69,10 @@ app.use((req,res,next)=>{
 app.use("/",userRoutes)
 app.use("/admin",adminRoutes)
 
+app.use((err, req, res, next) => {
+    console.error("MIDDLEWARE ERROR:", err.message);
+    res.status(500).send(err.message);
+});
 
 
 export default app 

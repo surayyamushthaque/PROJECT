@@ -155,6 +155,42 @@
     </div>
 </div>
 
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="editCategoryId">
+
+                <div class="mb-3">
+                    <label class="form-label">Category Name</label>
+                    <input type="text" class="form-control" id="editCategoryName">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="editCategoryDescription"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="updateCategory()">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // Load categories on page load
@@ -166,7 +202,8 @@ let categories = [];
 async function loadCategories() {
     try {
         const res = await fetch('/admin/categories');
-        categories = await res.json();
+        const result = await res.json()
+        categories = result.data
         renderTable();
     } catch (err) {
         console.error('Error loading categories:', err);
@@ -174,12 +211,12 @@ async function loadCategories() {
 }
 
 // Render table
-function renderTable(filteredCategories = categories.data) {
+function renderTable(filteredCategories = categories) {
     const tbody = document.getElementById('categoryBody');
     tbody.innerHTML = '';
     console.log(filteredCategories)
     filteredCategories.forEach(cat => {
-        const statusHTML = cat.status === 'listed' 
+        const statusHTML = cat.isListed
             ? `<span class="status-listed">listed</span>`
             : `<span class="status-unlisted">unlisted</span>`;
 
@@ -193,9 +230,9 @@ function renderTable(filteredCategories = categories.data) {
                 </td>
                 <td>${statusHTML}</td>
                 <td>
-                    <button class="btn btn-sm ${cat.status === 'listed' ? 'btn-danger' : 'btn-success'}" 
-                            onclick="toggleStatus('${cat._id}', '${cat.status}')">
-                        ${cat.status === 'listed' ? 'unlist' : 'list'}
+                    <button class="btn btn-sm ${cat.isListed ?'btn-danger' : 'btn-success'}" 
+                            onclick="toggleStatus('${cat._id}', ${cat.isListed})">
+                        ${cat.isListed ? 'unlist' : 'list'}
                     </button>
                 </td>
                 <td>
@@ -230,7 +267,12 @@ document.getElementById('categoryForm').addEventListener('submit', async (e) => 
             document.getElementById('categoryForm').reset();
             loadCategories();
         } else {
-            alert('Failed to create category');
+            Swal.fire({
+    icon: 'error',
+    title: 'Update Failed',
+    text: 'Failed to create category'
+});
+          
         }
     } catch (err) {
         console.error(err);
@@ -240,7 +282,7 @@ document.getElementById('categoryForm').addEventListener('submit', async (e) => 
 
 // Toggle list/unlist status
 async function toggleStatus(id, currentStatus) {
-    const newStatus = currentStatus === 'listed' ? 'unlisted' : 'listed';
+    const newStatus = currentStatus ? 'unlisted' : 'listed';
 
     try {
         await fetch(`/admin/categories/${id}/status`, {
@@ -250,24 +292,90 @@ async function toggleStatus(id, currentStatus) {
         });
         loadCategories();
     } catch (err) {
-        alert('Failed to update status');
+        Swal.fire({
+    icon: 'error',
+    title: 'Update Failed',
+    text: 'Failed to update status'
+});
     }
 }
 
 // Edit category (you can expand this)
-function editCategory(id) {
-    const cat = categories.find(c => c._id === id);
-    if (!cat) return;
+function editCategory(id){
+    const cat = categories.find(c=>c._id === id);
+    if(!cat)return
 
-    const newName = prompt("Edit Category Name:", cat.name);
-    if (newName && newName.trim()) {
-        fetch(`/admin/api/categories/${id}`, {
+    document.getElementById('editCategoryId').value = cat._id;
+    document.getElementById('editCategoryName').value = cat.name;
+    document.getElementById('editCategoryDescription').value = cat.description || "";
+    const modal = new bootstrap.Modal(
+        document.getElementById('editCategoryModal')
+    )
+    modal.show()
+}
+
+async function updateCategory() {
+    const id = document.getElementById('editCategoryId').value;
+    const name = document.getElementById('editCategoryName').value.trim();
+    const description = document.getElementById('editCategoryDescription').value.trim();
+
+    if (!name) {
+        return Swal.fire({
+            icon: 'warning',
+            title: 'Validation Error',
+            text: 'Category name is required.'
+        });
+    }
+
+    const result = await Swal.fire({
+        title: 'Save Changes?',
+        text: 'Do you want to update this category?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Update',
+        cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+        const response = await fetch(`/admin/category/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: newName.trim(), description: cat.description })
-        }).then(() => loadCategories());
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, description })
+        });
+         
+        const data = await response.json();
+        
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to update category');
+        }
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('editCategoryModal')
+        ).hide();
+
+        await Swal.fire({
+            icon: 'success',
+            title: 'Updated!',
+            text: 'Category updated successfully.'
+        });
+
+        loadCategories();
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Update Failed',
+            text: error.message
+        });
     }
 }
+
+
 
 // Search functionality
 function searchCategories() {

@@ -25,14 +25,18 @@ router.post("/unblock-user/:id", authMiddleware,adminroute.unblockUser);
 
 
 
-router.get("/category",adminroute.loadCategory)
+router.get("/category",adminroute.isAdmin,adminroute.loadCategory)
 router.post("/category",catogory.addCategory)
-router.put("/category:id",catogory.updateCategory)
-router.delete("/category:id",catogory.deleteCategory)
+router.put("/category/:id",catogory.updateCategory)
+router.delete("/category/:id",catogory.deleteCategory)
 router.get("/categories",catogory.getCategory)
 
-router.get("/productmanager",Product.getProducts)
-router.post("/add-product",upload.any(),Product.addProduct)
+router.get("/productmanager",adminroute.isAdmin,Product.getProducts)
+router.get("/addProduct",Product.getaddproduct)
+router.patch("/categories/:id/status",catogory.toggleCategoryStatus)
 
-
+router.post("/addProduct",upload.array("images",4),Product.addProduct)
+router.delete("/product/:id",Product.deleteProduct)
+router.get("/edit-Product/:id",Product.geteditProduct)
+router.post("/edit-Product/:id",upload.array("images",4),Product.editProduct)
 export default router;

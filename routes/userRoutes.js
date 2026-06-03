@@ -18,7 +18,7 @@ import {
 } from "../controllers/services/user/userprofilecontroller.js";
 import { getVerifyEmailPage } from "../controllers/services/user/userprofilecontroller.js";
 import profileAddress from "../controllers/services/user/addressController.js";
-// import {getProducts} from "../controllers/productController.js"
+import {loadshop} from "../controllers/services/user/userProductController.js"
 
 router.get("/",usercontroller.landingPage)
 router.get("/user/signup",usercontroller.loadSignup)
@@ -79,6 +79,7 @@ router.get("/address/edit/:id", isLoggedIn, profileAddress.editAddressPage);
 router.post("/address/edit/:id", isLoggedIn, profileAddress.updateAddress);
 router.post("/address/delete/:id", isLoggedIn, profileAddress.deleteAddress);
 
+router.get("/shop",loadshop)
 
 
 export default router
